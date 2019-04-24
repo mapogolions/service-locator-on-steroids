@@ -8,12 +8,13 @@ import io.github.mapogolions.maybedi.Container;
 
 public class App {
     public static void main(String ...args) {
-      System.out.println("I love this game");
+      System.out.println("Maybe di container");
       Container di = new Container();
-      di.putService(Db.class, container -> new Db());
-      di.putService(Session.class, container -> new Session());
-      di.putService(Hero.class, container -> new Hero("Balto", "1925"));
-      di.putService(Deps.class, container -> new Deps(container.getService(Session.class)));
+      di.put(Db.class, container -> new Db());
+      di.put(Session.class, container -> new Session());
+      di.param("name", "Balto");
+      di.put(Hero.class, container -> new Hero((String) container.param("name"), "1925"));
+      di.put(Deps.class, container -> new Deps(container.pull(Session.class)));
     }
 }
 

@@ -2,31 +2,61 @@ package io.github.mapogolions.maybedi;
 
 import java.util.function.*;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-// import io.github.mapogolions.maybedi.UnknownIdentifierException;
+import io.github.mapogolions.maybedi.UnknownIdentifierException;
+import io.github.mapogolions.maybedi.FrozenServiceException;
+
 
 public class Container {
   private Map<Class<?>, Function<Container, ?>> services = new HashMap<>();
-  private Map<Class<?>, Boolean> frozenServies = new HashMap<>();
-  private Map<Class<?>, Object> instantiatedServices = new HashMap<>();
+  private Map<Class<?>, Object> instances = new HashMap<>();
+  private List<Function<Container, ?>> factories = new ArrayList<>();
+  private Map<String, Object> params = new HashMap<>();
 
-  public <T> Container putService(Class<T> type, Function<Container, T> service) {
+  public <T> T pull(Class<T> type) throws UnknownIdentifierException {
+    if (!services.containsKey(type)) {
+      throw new UnknownIdentifierException(type.getName());
+    }
+    if (instances.containsKey(type)) {
+      return type.cast(instances.get(type));
+    }
+    if (factories.contains(services.get(type))) {
+      return type.cast(services.get(type).apply(this));
+    }
+    T service = type.cast(services.get(type).apply(this));
+    instances.put(type, service);
+    return service;
+  }
+
+  public <T> Container put(Class<T> type, Function<Container, T> service) {
+    if (services.containsKey(type)) {
+      throw new FrozenServiceException(type.getName());
+    }
     services.put(type, service);
     return this;
   }
 
-  public <T> T getService(Class<T> type) {
-    return type.cast(services.get(type).apply(this));
+  public <T> boolean contains(Class<T> type) {
+    return services.containsKey(type);
   }
 
-  public <T> T offsetGet(Class<T> type) throws UnknownIdentifierException {
-    if (!services.containsKey(type)) {
-      throw new UnknownIdentifierException(type.getName());
+  public <T> Container assemblyLine(Function<Container, T> service) {
+    factories.add(service);
+    return this;
+  }
+
+  public <T> Container param(String id, T item) {
+    params.put(id, item);
+    return this;
+  }
+
+  public <T> Object param(String id) {
+    if (!params.containsKey(id)) {
+      throw new UnknownIdentifierException(id);
     }
-    T service = type.cast(services.get(type).apply(this));
-    frozenServies.put(type, true);
-    instantiatedServices.put(type, service);
-    return service;
+    return params.get(id);
   }
 }
