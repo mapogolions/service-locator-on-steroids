@@ -7,7 +7,7 @@ import io.github.mapogolions.fixtures.*;
 
 public class ContainerTest {
   @Test(expected = UnknownIdentifierException.class)
-  public void testAttemptToGetUnregisteredService() {
+  public void testGetUnregisteredService() {
     Container di = new Container();
     di.get(FkService.class);
   }
@@ -37,14 +37,14 @@ public class ContainerTest {
   }
 
   @Test(expected = FrozenServiceException.class)
-  public void testAttemptToOverrideService() {
+  public void testOverrideService() {
     Container di = new Container();
     di.put(FkService.class, c -> new FkService());
     di.put(FkService.class, c -> new FkService());
   }
 
   @Test(expected = FrozenServiceException.class)
-  public void testAttemptToOverrideAssemblyLineService() {
+  public void testOverrideAssemblyLineService() {
     Container di = new Container();
     di.assemblyLine(FkService.class, c -> new FkService());
     di.assemblyLine(FkService.class, c -> new FkService());
@@ -85,5 +85,26 @@ public class ContainerTest {
     di.put(FkHero.class, c -> new FkHero("some hero"));
     di.put(FkSuperHeroes.class, c -> new FkSuperHeroes(c.get(FkHero.class)));
     Assert.assertEquals(di.get(FkHero.class), di.get(FkSuperHeroes.class).dreamTeam().get(0));
+  }
+
+  @Test 
+  public void testRemoveUnregesteredService() {
+    Container di = new Container();
+    Assert.assertFalse(di.remove(FkService.class));
+  }
+
+  @Test 
+  public void testRemoveRegesteredService() {
+    Container di = new Container();
+    di.put(FkService.class, c -> new FkService());
+    Assert.assertTrue(di.remove(FkService.class));
+  }
+
+  @Test
+  public void testPutServiceAgainAfterRemoval() {
+    Container di = new Container();
+    di.put(FkService.class, c -> new FkService());
+    Assert.assertTrue(di.remove(FkService.class));
+    di.put(FkService.class, c -> new FkService());
   }
 }
