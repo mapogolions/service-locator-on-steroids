@@ -2,32 +2,46 @@ package io.github.mapogolions.maybedi;
 
 import java.util.function.*;
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import io.github.mapogolions.maybedi.UnknownIdentifierException;
 import io.github.mapogolions.maybedi.FrozenServiceException;
 
 
 public class Container {
-  private Map<Class<?>, Function<Container, ?>> services = new HashMap<>();
-  private Map<Class<?>, Object> instances = new HashMap<>();
-  private List<Function<Container, ?>> factories = new ArrayList<>();
-  private Map<String, Object> params = new HashMap<>();
+  final private Map<Class<?>, Function<Container, ?>> services = new HashMap<>();
+  final private Map<Class<?>, Object> assemblies = new HashMap<>();
+  final private Map<Class<?>, Boolean> factories = new HashMap<>();
+  final private Map<String, Object> params = new HashMap<>();
+
+  public Map<Class<?>, Function<Container, ?>> getServices() {
+    return services;
+  }
+
+  public Map<Class<?>, Object> getAssemblies() {
+    return assemblies;
+  }
+
+  public Map<Class<?>, Boolean> getFactories() {
+    return factories;
+  }
+
+  public Map<String, Object> getParams() {
+    return params;
+  }
 
   public <T> T get(Class<T> type) throws UnknownIdentifierException {
     if (!services.containsKey(type)) {
       throw new UnknownIdentifierException(type.getName());
     }
-    if (instances.containsKey(type)) {
-      return type.cast(instances.get(type));
-    }
-    if (factories.contains(services.get(type))) {
+    if (factories.containsKey(type)) {
       return type.cast(services.get(type).apply(this));
     }
+    if (assemblies.containsKey(type)) {
+      return type.cast(assemblies.get(type));
+    }
     T service = type.cast(services.get(type).apply(this));
-    instances.put(type, service);
+    assemblies.put(type, service);
     return service;
   }
 
@@ -42,7 +56,7 @@ public class Container {
   public <T> boolean remove(Class<T> type) {
     if (services.containsKey(type)) {
       services.remove(type);
-      instances.remove(type);
+      assemblies.remove(type);
       return true;
     }
     return false;
@@ -52,11 +66,12 @@ public class Container {
     return services.containsKey(type);
   }
 
-  public <T> Container assemblyLine(Function<Container, T> service) {
-    if (factories.contains(service)) {
+  public <T> Container assemblyLine(Class<T> type, Function<Container, T> service) {
+    if (services.containsKey(type)) {
       throw new FrozenServiceException(service.toString());
     }
-    factories.add(service);
+    services.put(type, service);
+    factories.put(type, true);
     return this;
   }
 
