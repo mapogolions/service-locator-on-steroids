@@ -3,38 +3,9 @@
  */
 package io.github.mapogolions.maybedi;
 
-import io.github.mapogolions.maybedi.Container;
-
 
 public class App {
     public static void main(String ...args) {
       System.out.println("Maybe di container");
-      Container di = new Container();
-      di.put(Db.class, container -> new Db());
-      di.put(Session.class, container -> new Session());
-      di.pollute("name", "Balto");
-      di.put(Hero.class, container -> new Hero((String) container.global("name"), "1925"));
-      di.put(Deps.class, container -> new Deps(container.get(Session.class)));
     }
-}
-
-class Deps {
-  private Session session;
-  public Deps(Session session) {
-      this.session = session;
-  }
-}
-
-class Db {}
-
-class Session {}
-
-class Hero {
-  public String name;
-  public String year;
-
-  public Hero(String name, String year) {
-      this.name = name;
-      this.year = year;
-  }
 }
