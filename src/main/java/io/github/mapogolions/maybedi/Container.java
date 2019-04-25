@@ -58,15 +58,23 @@ public class Container {
     return this;
   }
 
-  public <T> Container pollute(String id, T item) {
+  public <T> Container define(String id, T item) {
     namespace.put(id, item);
     return this;
   }
 
-  public <T> Object global(String id) throws UnknownIdentifierException {
+  public <T> Object var(String id) throws UnknownIdentifierException {
     if (!namespace.containsKey(id)) {
       throw new UnknownIdentifierException(id);
     }
     return namespace.get(id);
+  }
+
+  public <T> boolean del(String id) {
+    if (namespace.containsKey(id)) {
+      namespace.remove(id);
+      return true;
+    }
+    return false;
   }
 }

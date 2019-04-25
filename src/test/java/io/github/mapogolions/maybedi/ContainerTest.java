@@ -53,8 +53,8 @@ public class ContainerTest {
   @Test
   public void testWithString() {
     Container di = new Container();
-    di.pollute("param", "value");
-    Assert.assertSame(di.global("param"), "value");
+    di.define("param", "value");
+    Assert.assertSame(di.var("param"), "value");
   }
 
   @Test
@@ -72,11 +72,11 @@ public class ContainerTest {
   }
 
   @Test
-  public void testInjectGlobalVariableToServiceCtor() {
+  public void testInjectGlobaldefineiableToServiceCtor() {
     Container di = new Container();
-    di.pollute("name", "Balto");
-    di.put(FkHero.class, c -> new FkHero((String) c.global("name")));
-    Assert.assertSame(di.global("name"), di.get(FkHero.class).getName());
+    di.define("name", "Balto");
+    di.put(FkHero.class, c -> new FkHero((String) c.var("name")));
+    Assert.assertSame(di.var("name"), di.get(FkHero.class).getName());
   }
 
   @Test
@@ -109,5 +109,13 @@ public class ContainerTest {
     di.put(FkService.class, c -> new FkService());
     Assert.assertTrue(di.remove(FkService.class));
     di.put(FkService.class, c -> new FkService());
+  }
+
+  @Test
+  public void testContainsService() {
+    Container di = new Container();
+    Assert.assertFalse(di.contains(FkService.class));
+    di.put(FkService.class, c -> new FkService());
+    Assert.assertTrue(di.contains(FkService.class));
   }
 }
