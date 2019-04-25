@@ -44,15 +44,6 @@ public class Container {
     return false;
   }
 
-  public <T> T pull(Class<T> type) {
-    T elem = null;
-    if (assemblies.containsKey(type)) {
-      elem = type.cast(assemblies.remove(type));
-    }
-    services.remove(type);
-    return elem;
-  }
-
   public <T> boolean contains(Class<T> type) {
     return services.containsKey(type);
   }
