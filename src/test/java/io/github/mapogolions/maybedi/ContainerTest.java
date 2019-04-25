@@ -2,28 +2,52 @@ package io.github.mapogolions.maybedi;
 
 import org.junit.Test;
 import org.junit.Assert;
-import io.github.mapogolions.maybedi.Container;
 import io.github.mapogolions.fixtures.*;
 
 
 public class ContainerTest {
-  @Test
-  public void testInitialState() {
+  @Test(expected = UnknownIdentifierException.class)
+  public void testAttemptToGetUnregisteredService() {
     Container di = new Container();
-    Assert.assertSame(0, di.getServices().size());
-    Assert.assertSame(0, di.getAssemblies().size());
-    Assert.assertSame(0, di.getFactories().size());
-    Assert.assertSame(0, di.getParams().size());
+    di.get(FkService.class);
   }
 
   @Test
-  public void testGetAServiceFromTheContainer() {
+  public void testGetRegisteredService() {
     Container di = new Container();
     FkPerson person = new FkPerson();
     di.put(FkPerson.class, c -> person);
     Assert.assertTrue(di.contains(FkPerson.class));
     Assert.assertEquals(di.get(FkPerson.class), person);
     Assert.assertTrue(di.get(FkPerson.class) instanceof FkPerson);
+  }
+
+  @Test
+  public void testContainerReturnsTheSameIntance() {
+    Container di = new Container();
+    di.put(FkService.class, c -> new FkService());
+    Assert.assertEquals(di.get(FkService.class), di.get(FkService.class));
+  }
+
+  @Test
+  public void testContainerReturnsTheDifferentInstances() {
+    Container di = new Container();
+    di.assemblyLine(FkService.class, c -> new FkService());
+    Assert.assertNotEquals(di.get(FkService.class), di.get(FkService.class));
+  }
+
+  @Test(expected = FrozenServiceException.class)
+  public void testAttemptToOverrideService() {
+    Container di = new Container();
+    di.put(FkService.class, c -> new FkService());
+    di.put(FkService.class, c -> new FkService());
+  }
+
+  @Test(expected = FrozenServiceException.class)
+  public void testAttemptToOverrideAssemblyLineService() {
+    Container di = new Container();
+    di.assemblyLine(FkService.class, c -> new FkService());
+    di.assemblyLine(FkService.class, c -> new FkService());
   }
 
   @Test
@@ -48,13 +72,6 @@ public class ContainerTest {
   }
 
   @Test
-  public void testAssemblyLineOfServices() {
-    Container di = new Container();
-    di.assemblyLine(FkService.class, c -> new FkService());
-    Assert.assertNotSame(di.get(FkService.class), di.get(FkService.class));
-  }
-
-  @Test
   public void testInjectGlobalVariableToServiceCtor() {
     Container di = new Container();
     di.pollute("name", "Balto");
@@ -68,11 +85,5 @@ public class ContainerTest {
     di.put(FkHero.class, c -> new FkHero("some hero"));
     di.put(FkSuperHeroes.class, c -> new FkSuperHeroes(c.get(FkHero.class)));
     Assert.assertEquals(di.get(FkHero.class), di.get(FkSuperHeroes.class).dreamTeam().get(0));
-  }
-
-  @Test(expected = UnknownIdentifierException.class)
-  public void testGetUnregistedService() {
-    Container di = new Container();
-    di.get(FkService.class);
   }
 }

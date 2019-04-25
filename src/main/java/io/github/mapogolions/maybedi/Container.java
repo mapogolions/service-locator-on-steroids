@@ -12,23 +12,7 @@ public class Container {
   final private Map<Class<?>, Function<Container, ?>> services = new HashMap<>();
   final private Map<Class<?>, Object> assemblies = new HashMap<>();
   final private Map<Class<?>, Boolean> factories = new HashMap<>();
-  final private Map<String, Object> params = new HashMap<>();
-
-  public Map<Class<?>, Function<Container, ?>> getServices() {
-    return services;
-  }
-
-  public Map<Class<?>, Object> getAssemblies() {
-    return assemblies;
-  }
-
-  public Map<Class<?>, Boolean> getFactories() {
-    return factories;
-  }
-
-  public Map<String, Object> getParams() {
-    return params;
-  }
+  final private Map<String, Object> namespace = new HashMap<>();
 
   public <T> T get(Class<T> type) throws UnknownIdentifierException {
     if (!services.containsKey(type)) {
@@ -76,14 +60,14 @@ public class Container {
   }
 
   public <T> Container pollute(String id, T item) {
-    params.put(id, item);
+    namespace.put(id, item);
     return this;
   }
 
   public <T> Object global(String id) {
-    if (!params.containsKey(id)) {
+    if (!namespace.containsKey(id)) {
       throw new UnknownIdentifierException(id);
     }
-    return params.get(id);
+    return namespace.get(id);
   }
 }
