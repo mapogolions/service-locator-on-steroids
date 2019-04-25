@@ -12,9 +12,9 @@ public class App {
       Container di = new Container();
       di.put(Db.class, container -> new Db());
       di.put(Session.class, container -> new Session());
-      di.param("name", "Balto");
-      di.put(Hero.class, container -> new Hero((String) container.param("name"), "1925"));
-      di.put(Deps.class, container -> new Deps(container.pull(Session.class)));
+      di.pollute("name", "Balto");
+      di.put(Hero.class, container -> new Hero((String) container.global("name"), "1925"));
+      di.put(Deps.class, container -> new Deps(container.get(Session.class)));
     }
 }
 
