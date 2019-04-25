@@ -4,9 +4,6 @@ import java.util.function.*;
 import java.util.Map;
 import java.util.HashMap;
 
-import io.github.mapogolions.maybedi.UnknownIdentifierException;
-import io.github.mapogolions.maybedi.FrozenServiceException;
-
 
 public class Container {
   final private Map<Class<?>, Function<Container, ?>> services = new HashMap<>();
@@ -29,7 +26,8 @@ public class Container {
     return service;
   }
 
-  public <T> Container put(Class<T> type, Function<Container, T> service) {
+  public <T> Container put(Class<T> type, Function<Container, T> service) 
+    throws FrozenServiceException {
     if (services.containsKey(type)) {
       throw new FrozenServiceException(type.getName());
     }
@@ -59,7 +57,8 @@ public class Container {
     return services.containsKey(type);
   }
 
-  public <T> Container assemblyLine(Class<T> type, Function<Container, T> service) {
+  public <T> Container assemblyLine(Class<T> type, Function<Container, T> service) 
+    throws FrozenServiceException {
     if (services.containsKey(type)) {
       throw new FrozenServiceException(service.toString());
     }
@@ -73,7 +72,7 @@ public class Container {
     return this;
   }
 
-  public <T> Object global(String id) {
+  public <T> Object global(String id) throws UnknownIdentifierException {
     if (!namespace.containsKey(id)) {
       throw new UnknownIdentifierException(id);
     }

@@ -84,7 +84,10 @@ public class ContainerTest {
     Container di = new Container();
     di.put(FkHero.class, c -> new FkHero("some hero"));
     di.put(FkSuperHeroes.class, c -> new FkSuperHeroes(c.get(FkHero.class)));
-    Assert.assertEquals(di.get(FkHero.class), di.get(FkSuperHeroes.class).dreamTeam().get(0));
+    Assert.assertEquals(
+      di.get(FkHero.class), 
+      di.get(FkSuperHeroes.class).dreamTeam().get(0)
+    );
   }
 
   @Test 
