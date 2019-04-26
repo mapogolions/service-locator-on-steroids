@@ -32,7 +32,7 @@ public class ContainerTest {
   @Test
   public void testContainerReturnsTheDifferentInstances() {
     Container di = new Container();
-    di.assemblyLine(FkService.class, c -> new FkService());
+    di.assemble(FkService.class, c -> new FkService());
     Assert.assertNotEquals(di.get(FkService.class), di.get(FkService.class));
   }
 
@@ -44,17 +44,42 @@ public class ContainerTest {
   }
 
   @Test(expected = FrozenServiceException.class)
-  public void testOverrideAssemblyLineService() {
+  public void testOverrideassembleService() {
     Container di = new Container();
-    di.assemblyLine(FkService.class, c -> new FkService());
-    di.assemblyLine(FkService.class, c -> new FkService());
+    di.assemble(FkService.class, c -> new FkService());
+    di.assemble(FkService.class, c -> new FkService());
   }
 
   @Test
-  public void testWithString() {
+  public void testDefineGlobalVariable() {
     Container di = new Container();
     di.define("param", "value");
     Assert.assertSame(di.var("param"), "value");
+  }
+
+  @Test
+  public void testReassignGlobalVariable() {
+    Container di = new Container();
+    di.define("lucky number", 7);
+    di.define("lucky number", 9);
+    Assert.assertSame(9, di.var("lucky number"));
+  }
+
+  @Test
+  public void testGlobalMutableStateWithassemble() {
+    Container di = new Container();
+    di.define("name", "Balto");
+    di.assemble(FkHero.class, c -> new FkHero((String) c.var("name")));
+    Assert.assertSame("Balto", di.get(FkHero.class).getName());
+    di.define("name", "Superman");
+    Assert.assertSame("Superman", di.get(FkHero.class).getName());
+  }
+
+  @Test
+  public void testUseDroppedGlobalVariable() {
+    Container di = new Container();
+    di.define("n", 10);
+    Assert.assertTrue(di.del("n"));
   }
 
   @Test

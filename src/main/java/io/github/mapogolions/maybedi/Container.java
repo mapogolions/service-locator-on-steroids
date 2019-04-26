@@ -48,7 +48,7 @@ public class Container {
     return services.containsKey(type);
   }
 
-  public <T> Container assemblyLine(Class<T> type, Function<Container, T> service) 
+  public <T> Container assemble(Class<T> type, Function<Container, T> service) 
     throws FrozenServiceException {
     if (services.containsKey(type)) {
       throw new FrozenServiceException(service.toString());
