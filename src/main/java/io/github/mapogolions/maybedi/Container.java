@@ -58,6 +58,20 @@ public class Container {
     return this;
   }
 
+  public <T> Container extend(Class<T> type, BiFunction<T, Container, T> decorator) 
+    throws UnknownIdentifierException, FrozenServiceException {
+    if (!services.containsKey(type)) {
+      throw new UnknownIdentifierException(type.getName());
+    }
+    if (assemblies.containsKey(type)) {
+      throw new FrozenServiceException(type.getName());
+    }
+    T entity = type.cast(services.get(type).apply(this));
+    Function<Container, T> service = c -> decorator.apply(entity, this);
+    services.put(type, service);
+    return this;  
+  }
+
   public <T> Container define(String id, T item) {
     namespace.put(id, item);
     return this;
