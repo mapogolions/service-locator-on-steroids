@@ -6,8 +6,7 @@ It's a service locator on steroids.
 
 * Based on - [Pimple](https://pimple.symfony.com/)
 * Motivation - learning by creating
-* It's not production, it's attempt to release
-* Pimple is a strange beast. Article about Pimple on [habr](https://habr.com/ru/post/199296/). See comments.
+* It's not production code
 
 *Service Locator*
 
@@ -29,9 +28,9 @@ Pretty similar, but isn't the same. In the former case class dependencies are hi
 
 ### Further reading
 
-* [PHP right way. Dependency Injection](https://phptherightway.com/#dependency_injection)
 * [What is Dependency Injection?](http://fabien.potencier.org/what-is-dependency-injection.html)
-* [Learning About Dependency Injection and PHP](http://ralphschindler.com/2011/05/18/learning-about-dependency-injection-and-php)
-* [What is Dependency Injection?](http://fabien.potencier.org/what-is-dependency-injection.html)
-* ["True" di container. See README.md](https://github.com/rdlowrey/auryn)
 * [Dependency Injection Containers are Code Polluters](https://www.yegor256.com/2014/10/03/di-containers-are-evil.html)
+* [PHP right way. Dependency Injection](https://phptherightway.com/#dependency_injection)
+* [Learning About Dependency Injection and PHP](http://ralphschindler.com/2011/05/18/learning-about-dependency-injection-and-php)
+* ["True" di container. See README.md](https://github.com/rdlowrey/auryn)
+* [Article about Pimple](https://habr.com/ru/post/199296/)
