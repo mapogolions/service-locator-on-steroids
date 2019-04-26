@@ -150,4 +150,32 @@ public class ContainerTest {
     di.put(FkService.class, c -> new FkService());
     Assert.assertTrue(di.contains(FkService.class));
   }
+
+  @Test(expected = UnknownIdentifierException.class)
+  public void testExtendValidatesKeyIsPresent() {
+    Container di = new Container();
+    di.extend(FkService.class, (entity, c) -> entity);
+  }
+
+  @Test(expected = FrozenServiceException.class)
+  public void testExtendAssembledService() {
+    Container di = new Container();
+    di.put(FkService.class, c -> new FkService());
+    di.get(FkService.class);
+    di.extend(FkService.class, (entity, c) -> entity);
+  }
+
+  @Test
+  public void testExtend() {
+    Container di = new Container();
+    di.put(FkPerson.class, c -> new FkPerson());
+    di.extend(FkPerson.class, (person, c) -> {
+      person.firstName = "John";
+      person.lastName = "Smith";
+      return person;
+    });
+    Assert.assertSame("John", di.get(FkPerson.class).firstName);
+    Assert.assertSame("Smith", di.get(FkPerson.class).lastName);
+    Assert.assertSame(0, di.get(FkPerson.class).age);
+  }
 }
