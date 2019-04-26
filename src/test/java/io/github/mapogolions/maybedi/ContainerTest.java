@@ -15,11 +15,11 @@ public class ContainerTest {
   @Test
   public void testGetRegisteredService() {
     Container di = new Container();
-    FkPerson person = new FkPerson();
-    di.put(FkPerson.class, c -> person);
-    Assert.assertTrue(di.contains(FkPerson.class));
-    Assert.assertEquals(di.get(FkPerson.class), person);
-    Assert.assertTrue(di.get(FkPerson.class) instanceof FkPerson);
+    FkService service = new FkService();
+    di.put(FkService.class, c -> service);
+    Assert.assertTrue(di.contains(FkService.class));
+    Assert.assertEquals(di.get(FkService.class), service);
+    Assert.assertTrue(di.get(FkService.class) instanceof FkService);
   }
 
   @Test
@@ -43,18 +43,17 @@ public class ContainerTest {
     di.put(FkService.class, c -> new FkService());
   }
 
-  @Test(expected = FrozenServiceException.class)
-  public void testOverrideassembleService() {
-    Container di = new Container();
-    di.assemble(FkService.class, c -> new FkService());
-    di.assemble(FkService.class, c -> new FkService());
-  }
-
   @Test
   public void testDefineGlobalVariable() {
     Container di = new Container();
     di.define("param", "value");
     Assert.assertSame(di.var("param"), "value");
+  }
+
+  @Test(expected = UnknownIdentifierException.class)
+  public void testUseUnsetGlobalVariable() {
+    Container di = new Container();
+    di.var("name");
   }
 
   @Test
@@ -66,7 +65,7 @@ public class ContainerTest {
   }
 
   @Test
-  public void testGlobalMutableStateWithassemble() {
+  public void testSharedGlobalMutableState() {
     Container di = new Container();
     di.define("name", "Balto");
     di.assemble(FkHero.class, c -> new FkHero((String) c.var("name")));
@@ -76,10 +75,11 @@ public class ContainerTest {
   }
 
   @Test
-  public void testUseDroppedGlobalVariable() {
+  public void testUnsetGlobalVariable() {
     Container di = new Container();
-    di.define("n", 10);
-    Assert.assertTrue(di.del("n"));
+    di.define("defined global variable", 10);
+    Assert.assertTrue(di.del("defined global variable"));
+    Assert.assertFalse(di.del("undefined global variable"));
   }
 
   @Test
@@ -105,13 +105,20 @@ public class ContainerTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testInjectOneServiceToAnother() {
     Container di = new Container();
-    di.put(FkHero.class, c -> new FkHero("some hero"));
-    di.put(FkSuperHeroes.class, c -> new FkSuperHeroes(c.get(FkHero.class)));
-    Assert.assertEquals(
-      di.get(FkHero.class), 
-      di.get(FkSuperHeroes.class).dreamTeam().get(0)
+    di.put(FkCacheItem.class, c -> new FkCacheItem<String, Integer>("one", 1));
+    di.put(FkCache.class, c -> {
+      FkCache<String, Integer> cache = new FkCache<>();
+      cache.save(c.get(FkCacheItem.class));
+      return cache;
+    });
+    Assert.assertTrue(di.contains(FkCacheItem.class));
+    Assert.assertTrue(di.contains(FkCache.class));
+    Assert.assertSame(
+      di.get(FkCacheItem.class).getValue(),
+      di.get(FkCache.class).obtain(0).getValue()
     );
   }
 
