@@ -4,9 +4,22 @@ It's a service locator on steroids.
 
 ### Disclaimers
 
-* Based on - [Pimple](https://pimple.symfony.com/)
+* Based on [Pimple](https://pimple.symfony.com/)
 * Motivation - learning by creating
-* It's not production code
+* It isn't production code
+
+### Service Locator / Eel
+
+Eel is (to my thinking) definitely not a canonical *dependency injection container*. Eel does not have many important properties, such as:
+
+* revealing cycle dependencies
+* recursive dependency instantiation
+* doesn't use reflection API (for smart injection)
+* ...
+
+but on the other hand, it avoids the main problem inherent in service locator - **hiding class dependencies**.
+
+Let's look at the following code snippets:
 
 *Service Locator*
 
@@ -32,5 +45,5 @@ Pretty similar, but isn't the same. In the former case class dependencies are hi
 * [Dependency Injection Containers are Code Polluters](https://www.yegor256.com/2014/10/03/di-containers-are-evil.html)
 * [PHP right way. Dependency Injection](https://phptherightway.com/#dependency_injection)
 * [Learning About Dependency Injection and PHP](http://ralphschindler.com/2011/05/18/learning-about-dependency-injection-and-php)
-* ["True" di container. See README.md](https://github.com/rdlowrey/auryn)
+* [Auryn is a recursive dependency injector](https://github.com/rdlowrey/auryn)
 * [Article about Pimple](https://habr.com/ru/post/199296/)
