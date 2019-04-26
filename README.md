@@ -37,7 +37,16 @@ di.put(Config.class, c -> new Config());
 di.put(Db.class, c -> new Db(c.get(Config.class)));
 ```
 
-Pretty similar, but isn't the same. In the former case class dependencies are hidden, but in the last - they are visible. As result, code becomes more maintainable and testable. Your API no longer lies to you.
+The are pretty similar, but aren't the same. In the former case, class dependencies are hidden, but in the last - they are visible. As result, code becomes more maintainable and testable. *Your API no longer lies to you*.
+
+
+### Eel in action
+
+// Tood: need to implement
+
+### How to use
+
+// Todo: need to implement
 
 ### Further reading
 
