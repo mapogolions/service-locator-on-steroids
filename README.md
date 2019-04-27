@@ -17,7 +17,7 @@ Eel is (to my thinking) definitely not a canonical *dependency injection contain
 * doesn't use reflection API (for smart injection)
 * ...
 
-but on the other hand, it avoids the main problem inherent in service locator - **hiding class dependencies**.
+but at the same time, it avoids the main problem inherent in service locator - **hiding class dependencies**.
 
 Let's look at the following code snippets:
 
@@ -37,7 +37,7 @@ di.put(Config.class, c -> new Config());
 di.put(Db.class, c -> new Db(c.get(Config.class)));
 ```
 
-They are pretty similar, but aren't the same. In the former case, class dependencies are hidden, but in the last - they are visible. As result, code becomes more maintainable and testable. *Your API no longer lies to you*.
+They are pretty similar, but aren't the same. In the former case, class dependencies are hidden, but in the last - they are visible. As result, code becomes more maintainable and testable. Your API no longer lies to you.
 
 
 ### Eel in action

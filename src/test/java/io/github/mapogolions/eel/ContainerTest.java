@@ -1,4 +1,4 @@
-package io.github.mapogolions.maybedi;
+package io.github.mapogolions.eel;
 
 import org.junit.Test;
 import org.junit.Assert;
@@ -23,17 +23,17 @@ public class ContainerTest {
   }
 
   @Test
-  public void testContainerReturnsTheSameIntance() {
+  public void testContainerReturnsTheDifferentInstances() {
     Container di = new Container();
     di.put(FkService.class, c -> new FkService());
-    Assert.assertEquals(di.get(FkService.class), di.get(FkService.class));
+    Assert.assertNotEquals(di.get(FkService.class), di.get(FkService.class));
   }
 
   @Test
-  public void testContainerReturnsTheDifferentInstances() {
+  public void testContainerReturnsTheSameInstance() {
     Container di = new Container();
-    di.assemble(FkService.class, c -> new FkService());
-    Assert.assertNotEquals(di.get(FkService.class), di.get(FkService.class));
+    di.share(FkService.class, c -> new FkService());
+    Assert.assertEquals(di.get(FkService.class), di.get(FkService.class));
   }
 
   @Test(expected = FrozenServiceException.class)
@@ -47,13 +47,13 @@ public class ContainerTest {
   public void testDefineGlobalVariable() {
     Container di = new Container();
     di.define("param", "value");
-    Assert.assertSame(di.var("param"), "value");
+    Assert.assertSame(di.variable("param"), "value");
   }
 
   @Test(expected = UnknownIdentifierException.class)
   public void testUseUnsetGlobalVariable() {
     Container di = new Container();
-    di.var("name");
+    di.variable("name");
   }
 
   @Test
@@ -61,14 +61,14 @@ public class ContainerTest {
     Container di = new Container();
     di.define("lucky number", 7);
     di.define("lucky number", 9);
-    Assert.assertSame(9, di.var("lucky number"));
+    Assert.assertSame(9, di.variable("lucky number"));
   }
 
   @Test
   public void testSharedGlobalMutableState() {
     Container di = new Container();
     di.define("name", "Balto");
-    di.assemble(FkHero.class, c -> new FkHero((String) c.var("name")));
+    di.put(FkHero.class, c -> new FkHero(c.variable("name", String.class)));
     Assert.assertSame("Balto", di.get(FkHero.class).getName());
     di.define("name", "Superman");
     Assert.assertSame("Superman", di.get(FkHero.class).getName());
@@ -78,8 +78,8 @@ public class ContainerTest {
   public void testUnsetGlobalVariable() {
     Container di = new Container();
     di.define("defined global variable", 10);
-    Assert.assertTrue(di.del("defined global variable"));
-    Assert.assertFalse(di.del("undefined global variable"));
+    Assert.assertTrue(di.delete("defined global variable"));
+    Assert.assertFalse(di.delete("undefined global variable"));
   }
 
   @Test
@@ -97,11 +97,11 @@ public class ContainerTest {
   }
 
   @Test
-  public void testInjectGlobaldefineiableToServiceCtor() {
+  public void testInjectGlobalVariableToServiceCtor() {
     Container di = new Container();
     di.define("name", "Balto");
-    di.put(FkHero.class, c -> new FkHero((String) c.var("name")));
-    Assert.assertSame(di.var("name"), di.get(FkHero.class).getName());
+    di.put(FkHero.class, c -> new FkHero((String) c.variable("name")));
+    Assert.assertSame(di.variable("name"), di.get(FkHero.class).getName());
   }
 
   @Test
@@ -158,9 +158,9 @@ public class ContainerTest {
   }
 
   @Test(expected = FrozenServiceException.class)
-  public void testExtendAssembledService() {
+  public void testExtendSharedService() {
     Container di = new Container();
-    di.put(FkService.class, c -> new FkService());
+    di.share(FkService.class, c -> new FkService());
     di.get(FkService.class);
     di.extend(FkService.class, (entity, c) -> entity);
   }

@@ -1,4 +1,4 @@
-package io.github.mapogolions.maybedi;
+package io.github.mapogolions.eel;
 
 import java.util.function.*;
 import java.util.Map;
@@ -8,22 +8,22 @@ import java.util.HashMap;
 public class Container {
   final private Map<Class<?>, Function<Container, ?>> services = new HashMap<>();
   final private Map<Class<?>, Object> assemblies = new HashMap<>();
-  final private Map<Class<?>, Boolean> factories = new HashMap<>();
+  final private Map<Class<?>, Boolean> shared = new HashMap<>();
   final private Map<String, Object> namespace = new HashMap<>();
 
   public <T> T get(Class<T> type) throws UnknownIdentifierException {
     if (!services.containsKey(type)) {
       throw new UnknownIdentifierException(type.getName());
     }
-    if (factories.containsKey(type)) {
-      return type.cast(services.get(type).apply(this));
+    if (shared.containsKey(type)) {
+      if (assemblies.containsKey(type)) {
+        return type.cast(assemblies.get(type));
+      }
+      T service = type.cast(services.get(type).apply(this));
+      assemblies.put(type, service);
+      return service;
     }
-    if (assemblies.containsKey(type)) {
-      return type.cast(assemblies.get(type));
-    }
-    T service = type.cast(services.get(type).apply(this));
-    assemblies.put(type, service);
-    return service;
+    return type.cast(services.get(type).apply(this));
   }
 
   public <T> Container put(Class<T> type, Function<Container, T> service) 
@@ -37,6 +37,9 @@ public class Container {
 
   public <T> boolean remove(Class<T> type) {
     if (services.containsKey(type)) {
+      if (shared.containsKey(type)) {
+        shared.remove(type);
+      }
       services.remove(type);
       assemblies.remove(type);
       return true;
@@ -48,13 +51,13 @@ public class Container {
     return services.containsKey(type);
   }
 
-  public <T> Container assemble(Class<T> type, Function<Container, T> service) 
+  public <T> Container share(Class<T> type, Function<Container, T> service) 
     throws FrozenServiceException {
     if (services.containsKey(type)) {
       throw new FrozenServiceException(service.toString());
     }
     services.put(type, service);
-    factories.put(type, true);
+    shared.put(type, true);
     return this;
   }
 
@@ -77,14 +80,18 @@ public class Container {
     return this;
   }
 
-  public <T> Object var(String id) throws UnknownIdentifierException {
+  public <T> Object variable(String id) throws UnknownIdentifierException {
     if (!namespace.containsKey(id)) {
       throw new UnknownIdentifierException(id);
     }
     return namespace.get(id);
   }
 
-  public <T> boolean del(String id) {
+  public <T> T variable(String id, Class<T> type) throws UnknownIdentifierException {
+    return type.cast(variable(id));
+  }
+
+  public <T> boolean delete(String id) {
     if (namespace.containsKey(id)) {
       namespace.remove(id);
       return true;

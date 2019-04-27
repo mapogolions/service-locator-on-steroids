@@ -1,4 +1,4 @@
-package io.github.mapogolions.maybedi;
+package io.github.mapogolions.eel;
 
 
 final class FrozenServiceException extends RuntimeException {

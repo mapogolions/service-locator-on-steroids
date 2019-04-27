@@ -1,4 +1,4 @@
-package io.github.mapogolions.maybedi;
+package io.github.mapogolions.eel;
 
 final class UnknownIdentifierException extends IllegalArgumentException {
   private static final long serialVersionUID = -3195583549492361423L;
