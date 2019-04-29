@@ -1,4 +1,4 @@
-package io.github.mapogolions.eel;
+package io.github.mapogolions.container;
 
 import java.util.function.*;
 import java.util.Map;

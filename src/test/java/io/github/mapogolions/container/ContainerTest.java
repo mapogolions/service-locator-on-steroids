@@ -1,4 +1,4 @@
-package io.github.mapogolions.eel;
+package io.github.mapogolions.container;
 
 import org.junit.Test;
 import org.junit.Assert;
