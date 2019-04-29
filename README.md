@@ -1,20 +1,20 @@
-## Eel
+## Container. Under the hood.
 
 It's a service locator on steroids.
 
 ### Disclaimers
 
-* Based on [Pimple](https://pimple.symfony.com/)
+* Based on opensource
 * Motivation - learning by creating
 * It isn't production code
 
-### Service Locator / Eel
+### Problem
 
-Eel is (to my thinking) definitely not a canonical *dependency injection container*. Eel does not have many important properties, such as:
+It is (to my thinking) definitely not a canonical *dependency injection container*. It does not have many important properties, such as:
 
 * revealing cycle dependencies
 * recursive dependency instantiation
-* doesn't use reflection API (for smart injection)
+* using reflection API (for smart injection)
 * ...
 
 but at the same time, it avoids the main problem inherent in service locator - **hiding class dependencies**.
@@ -29,7 +29,7 @@ di.put(Config.class, new Config(di));
 di.put(Db.class, new Db(di));
 ```
 
-*Eel*
+*Service Locator on steroids*
 
 ```java
 Container di = new Container();
@@ -38,15 +38,6 @@ di.put(Db.class, c -> new Db(c.get(Config.class)));
 ```
 
 They are pretty similar, but aren't the same. In the former case, class dependencies are hidden, but in the last - they are visible. As result, code becomes more maintainable and testable. Your API no longer lies to you.
-
-
-### Eel in action
-
-// Todo: need to implement
-
-### How to use
-
-// Todo: need to implement
 
 ### Further reading
 
